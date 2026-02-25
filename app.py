@@ -2,10 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# 1. إعدادات الصفحة الاحترافية
 st.set_page_config(page_title="Saudi Solar Intelligence", page_icon="☀️", layout="wide")
 
-# تنسيق مخصص للبطاقات (Metrics)
 st.markdown("""
     <style>
     .stMetric { background-color: #1f2937; padding: 20px; border-radius: 12px; border: 1px solid #374151; }
@@ -13,17 +11,14 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 try:
-    # 2. تحميل البيانات وتنظيفها
+    #  تحميل البيانات وتنظيفها
     df = pd.read_csv('ksa_solar_dataset_2024_detailed.csv', encoding='cp1252')
     df.columns = df.columns.str.strip()
     df = df.dropna()
 
-    # 3. التأكد من أسماء الأعمدة الصحيحة
-    # سنستخدم 'City' للمدن و 'GHI' للبيانات (أو Latitude إذا لم يتوفر GHI)
     city_col = 'City'
     data_col = 'GHI' if 'GHI' in df.columns else 'Latitude'
 
-    # 4. القائمة الجانبية (Sidebar) - الآن تظهر المدن وليس التواريخ
     with st.sidebar:
         st.header("⚙️ التحكم بالعرض")
         all_cities = df[city_col].unique()
@@ -33,7 +28,6 @@ try:
         st.info("هذا النظام يحلل بيانات الإشعاع الشمسي لعام 2024.")
 
     # 5. معالجة البيانات المختارة (Grouping)
-    # تجميع البيانات حسب المدينة لضمان عدم وجود "زحمة" في الرسم
     filtered_df = df[df[city_col].isin(selected_cities)]
     summary = filtered_df.groupby(city_col)[data_col].mean().reset_index().sort_values(by=data_col, ascending=False)
 
@@ -71,4 +65,5 @@ try:
         st.dataframe(summary.style.background_gradient(cmap='YlOrRd'), use_container_width=True, hide_index=True)
 
 except Exception as e:
+
     st.error(f"حدث خطأ في قراءة الأعمدة. تأكدي أن الملف يحتوي على عمود باسم 'City'. التفاصيل: {e}")
